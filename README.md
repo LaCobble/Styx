@@ -1,4 +1,4 @@
-![Styx](Styx.png)
+![Styx](Repo_img/Styx.png)
 
 Styx is a Python script for file encryption and decryption. The script uses AES encryption and PBKDF2 key derivation algorithm to encrypt and decrypt files and folders. The script also has a function to send an email with the decryption key, which includes the IP address, encryption key, and time of encryption. The user should configure the SMTP server with the correct details for the email function to work.
 
@@ -20,6 +20,14 @@ socket: to get the IP address of the computer
 art: to generate ASCII art
 cryptography: to perform cryptography functions like encryption, decryption, and key derivation
 email.mime.text: to create the text of the email to be sent
+```
+
+## Installation
+
+Using pip:
+
+```bash
+pip install -r requirements.txt
 ```
 
 ## Usage
