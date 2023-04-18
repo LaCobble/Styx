@@ -40,11 +40,11 @@ pip install -r requirements.txt
 
 ```python
 python Styx.py
-
+```
 To use the program, the user can execute the main() function, which asks the user if he or she wants to encrypt or decrypt a file or folder, and requests the information needed to perform the chosen operation.
 
 It should be noted that this program is intended for personal use and not for professional or commercial use. It should be used with care and encrypted files should be saved in a safe place.
-```
+
 
 ## License
 
