@@ -1,5 +1,3 @@
-Tu es un développeur sénior, fait moi la page de présentation du code suivant pour github :
-
 # Projet : Styx
 # Author:
 #      __          ___      _     _     _      
