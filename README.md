@@ -1,5 +1,5 @@
 <p align="center">
-<img src="Repo_img/Styx.png"/ width=50% height=50%>
+<img src="Styx_icon.png"/ width=50% height=50%>
 </p>
 
 This project is a program for encrypting and decrypting files and folders using an encryption key generated from a password provided by the user. It uses the AES-CBC symmetric encryption algorithm with a key derived using the PBKDF2HMAC function.
