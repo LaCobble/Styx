@@ -8,13 +8,25 @@
 #
 #
 
+import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QPushButton, QLineEdit, QFileDialog, QMessageBox
 from PyQt5.QtGui import QPixmap, QIcon
 import sys
 
 from styx import encrypt, decrypt, encrypt_folder, decrypt_folder
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 class MainWindow(QMainWindow):
+
 
     file_paths = []
     folder_paths = []
@@ -26,14 +38,14 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("STYX")
 
         # Set window icon
-        self.setWindowIcon(QIcon('images/Styx_icon.png'))
+        self.setWindowIcon(QIcon(resource_path('Styx_icon.png')))
 
         # Set window size
         self.setGeometry(100, 100, 600, 290)
 
         # Set background image
         background = QLabel(self)
-        pixmap = QPixmap('images/background.jpg')
+        pixmap = QPixmap(resource_path('background.jpg'))
         background.setPixmap(pixmap)
         background.resize(self.width(), self.height())
 
@@ -66,11 +78,11 @@ class MainWindow(QMainWindow):
         self.newWindow = QWidget()
         self.newWindow.setWindowTitle(action)
         self.newWindow.setGeometry(100, 100, 600, 400)
-        self.newWindow.setWindowIcon(QIcon('images/Styx_icon.png'))
+        self.newWindow.setWindowIcon(QIcon(resource_path('Styx_icon.png')))
 
         # Set background image
         background = QLabel(self.newWindow)
-        pixmap = QPixmap('images/background.jpg')
+        pixmap = QPixmap(resource_path('background.jpg'))
         background.setPixmap(pixmap)
         background.resize(self.newWindow.width(), self.newWindow.height())
 
