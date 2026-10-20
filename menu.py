@@ -12,8 +12,32 @@ import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QPushButton, QLineEdit, QFileDialog, QMessageBox
 from PyQt5.QtGui import QPixmap, QIcon
 import sys
+import warnings
 
-from styx import encrypt, decrypt, encrypt_folder, decrypt_folder
+from styx import (
+    AlreadyEncryptedError,
+    LegacyFormatWarning,
+    StyxError,
+    decrypt_file,
+    decrypt_folder,
+    encrypt_file,
+    encrypt_folder,
+)
+
+
+def _summarize(done, failed, skipped, legacy, verb):
+    """Build the message shown after an encrypt/decrypt run."""
+    lines = [f"{done} file(s) {verb}."]
+    if skipped:
+        lines.append(f"{len(skipped)} skipped:")
+        lines += [f"  {p}: {why}" for p, why in skipped[:10]]
+    if failed:
+        lines.append(f"{len(failed)} failed (file left unchanged):")
+        lines += [f"  {p}: {why}" for p, why in failed[:10]]
+    if legacy:
+        lines.append(f"{len(legacy)} file(s) were in the old unauthenticated format. "
+                     "Encrypt them again to upgrade them.")
+    return "\n".join(lines)
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -21,7 +45,7 @@ def resource_path(relative_path):
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")
+        base_path = os.path.dirname(os.path.abspath(__file__))
 
     return os.path.join(base_path, relative_path)
 
@@ -137,24 +161,32 @@ class MainWindow(QMainWindow):
                     error_dialog.setText("WRONG PASSWORDS")
                     error_dialog.setStandardButtons(QMessageBox.Ok)
                     error_dialog.exec_()
+                elif not password:
+                    QMessageBox.critical(self.newWindow, "Error", "The password must not be empty.")
                 else:
-                    try:
-                        for file in file_paths:
-                            for f in file:
-                                encrypt(f, password)
-                        for folder in folder_paths:
-                            encrypt_folder(folder, password)
+                    done, failed, skipped = 0, [], []
+                    for file in file_paths:
+                        for f in file:
+                            try:
+                                encrypt_file(f, password)
+                                done += 1
+                            except AlreadyEncryptedError:
+                                skipped.append((f, "already encrypted"))
+                            except (OSError, StyxError) as exc:
+                                failed.append((f, str(exc)))
+                    for folder in folder_paths:
+                        report = encrypt_folder(folder, password)
+                        done += len(report.processed)
+                        failed += report.failed
+                        skipped += report.skipped
 
-                        QMessageBox.information(self, "Success", "The file(s) has been successfully encrypted.")
+                    message = _summarize(done, failed, skipped, [], "encrypted")
+                    if failed:
+                        QMessageBox.critical(self.newWindow, "Error while encrypting", message)
+                    else:
+                        QMessageBox.information(self, "Success", message)
                         self.newWindow.close()
                         self.show()
-                    except:
-                        error_dialog = QMessageBox()
-                        error_dialog.setIcon(QMessageBox.Critical)
-                        error_dialog.setWindowTitle("Error")
-                        error_dialog.setText("Error while encrypting")
-                        error_dialog.setStandardButtons(QMessageBox.Ok)
-                        error_dialog.exec_()
 
         # Set back button
             back_button = QPushButton("Back", self.newWindow)
@@ -181,23 +213,39 @@ class MainWindow(QMainWindow):
 
             def handle_decrypt_clicked(self, file_paths, folder_paths):
                 password = password_input.text()
-                try:
-                    for file in file_paths:
-                        for f in file:
-                            decrypt(f, password)
-                    for folder in folder_paths:
-                        decrypt_folder(folder, password)
+                if not password:
+                    QMessageBox.critical(self.newWindow, "Error", "The password must not be empty.")
+                    return
+                done, failed, skipped, legacy = 0, [], [], []
+                for file in file_paths:
+                    for f in file:
+                        try:
+                            with warnings.catch_warnings():
+                                warnings.simplefilter("ignore", LegacyFormatWarning)
+                                if decrypt_file(f, password) == 0:
+                                    legacy.append(f)
+                            done += 1
+                        except (OSError, StyxError) as exc:
+                            failed.append((f, str(exc)))
+                for folder in folder_paths:
+                    report = decrypt_folder(folder, password)
+                    done += len(report.processed)
+                    failed += report.failed
+                    skipped += report.skipped
+                    legacy += report.legacy
 
-                    QMessageBox.information(self, "Success", "The file(s) has been successfully decrypted.")
+                message = _summarize(done, failed, skipped, legacy, "decrypted")
+                if failed:
+                    QMessageBox.critical(self.newWindow, "Error while decrypting",
+                                         message + "\nCheck your password.")
+                elif legacy:
+                    QMessageBox.warning(self, "Decrypted (legacy format)", message)
                     self.newWindow.close()
                     self.show()
-                except:
-                    error_dialog = QMessageBox()
-                    error_dialog.setIcon(QMessageBox.Critical)
-                    error_dialog.setWindowTitle("Error")
-                    error_dialog.setText("Error while decrypting, check your password.")
-                    error_dialog.setStandardButtons(QMessageBox.Ok)
-                    error_dialog.exec_()
+                else:
+                    QMessageBox.information(self, "Success", message)
+                    self.newWindow.close()
+                    self.show()
 
 # Set encrypt/decrypt button
             submit_button_D = QPushButton(action.capitalize(), self.newWindow)
