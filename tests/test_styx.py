@@ -35,7 +35,7 @@ def roundtrip(path, data, **kwargs):
     encrypt_file(path, PASSWORD, kdf_params=FAST, chunk_size=CHUNK, **kwargs)
     enc = path.read_bytes()
     assert enc.startswith(b"STYX\x01")
-    if data:
+    if len(data) >= 16:  # short inputs can appear in random bytes by chance
         assert data not in enc
     assert decrypt_file(path, PASSWORD) == 1
     assert path.read_bytes() == data
