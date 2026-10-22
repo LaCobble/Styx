@@ -1,2 +1,2 @@
-cryptography>=44.0.0
+cryptography>=50.0.2
 PyQt5>=5.15
