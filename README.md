@@ -32,9 +32,31 @@ pip install -r requirements.txt    # cryptography>=44, PyQt5>=5.15
 python menu.py
 ```
 
-Choose **Encrypt** or **Decrypt**, pick files and/or a folder, type the
-password (twice when encrypting) and confirm. At the end, Styx lists the files
-that were processed, skipped or failed.
+Pick **Encrypt** or **Decrypt**, drop files or folders on the window (or use
+**Add files…** / **Add folder…**), type the password (twice when encrypting,
+with a strength indicator) and start. Files are processed one by one in the
+background with a progress bar; at the end, Styx shows how many files
+succeeded, were skipped or failed, and why.
+
+The window follows the system light or dark appearance (set `STYX_THEME=dark`
+or `STYX_THEME=light` to force one). Keyboard: `Ctrl+O` add files,
+`Ctrl+Shift+O` add a folder, `Ctrl+1` / `Ctrl+2` switch mode, `Enter` start,
+`Esc` cancel, `Delete` remove the selected item.
+
+| Dark | Light |
+|---|---|
+| ![Styx in dark mode](docs/images/form-dark.png) | ![Styx in light mode](docs/images/form-light.png) |
+| ![Decryption summary](docs/images/result-dark.png) | ![Encryption in progress](docs/images/progress-light.png) |
+
+To build a standalone app with PyInstaller:
+
+```bash
+pip install pyinstaller
+pyinstaller --onefile --windowed --name Styx --icon Styx.ico \
+  --add-data "Styx_icon.png:." --add-data "styx/gui/assets:styx/gui/assets" menu.py
+```
+
+(On Windows, use `;` instead of `:` in `--add-data`.)
 
 ### Command line
 
@@ -167,6 +189,13 @@ Styx is a personal project and has not been independently audited.
 pip install -r requirements-dev.txt
 python -m pytest
 ```
+
+The GUI tests use [pytest-qt](https://pytest-qt.readthedocs.io/) and run
+headless (`QT_QPA_PLATFORM=offscreen`).
+
+The display font, [Marcellus](https://fonts.google.com/specimen/Marcellus) by
+Astigmatic, is bundled under the SIL Open Font License
+(`styx/gui/assets/Marcellus-OFL.txt`).
 
 ## License
 
