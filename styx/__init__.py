@@ -12,6 +12,7 @@ from .crypto import (
 from .files import (
     AlreadyEncryptedError,
     FolderReport,
+    collect_files,
     decrypt_file,
     decrypt_folder,
     encrypt_file,
@@ -28,6 +29,7 @@ __all__ = [
     "KdfParams",
     "LegacyFormatWarning",
     "StyxError",
+    "collect_files",
     "decrypt_file",
     "decrypt_folder",
     "decrypt_stream",

@@ -123,6 +123,18 @@ def _iter_files(folder: Path, report: FolderReport):
                 yield p
 
 
+def collect_files(folder: str | os.PathLike) -> tuple[list[Path], list[tuple[Path, str]]]:
+    """List the files a folder operation would process, without touching them.
+
+    Returns ``(files, skipped)`` where ``skipped`` holds ``(path, reason)``
+    pairs for entries that folder operations ignore (symbolic links, Styx
+    temporary files). Useful to show progress file by file.
+    """
+    report = FolderReport()
+    files = list(_iter_files(Path(folder), report))
+    return files, report.skipped
+
+
 def encrypt_folder(folder: str | os.PathLike, password: str, **kwargs) -> FolderReport:
     """Encrypt every regular file under ``folder`` in place (recursively).
 
