@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
