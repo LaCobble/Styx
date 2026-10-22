@@ -1,2 +1,2 @@
 cryptography>=44.0.0
-PyQt5>=5.15
+PyQt5>=5.15.11
